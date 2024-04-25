@@ -22,7 +22,7 @@ from dotenv import load_dotenv
 
 
 # loading env variables
-load_dotenv()
+#load_dotenv()
 
 app = Flask(__name__)
 app.secret_key = os.environ['session_secret_key']
@@ -45,6 +45,7 @@ data_dictionaries = {}
 for f_name in ['loans', 'leads']:
     with open(f'queries/{f_name}.sql') as f:
         datasets[f_name] = pd.read_sql(f.read(), engine)
+        print(datasets[f_name].memory_usage(deep=True).sum())
     with open(f'data dictionaries/{f_name}.json') as f:
         data_dictionaries[f_name] = json.load(f)    
 
