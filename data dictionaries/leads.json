@@ -1,0 +1,158 @@
+{
+    "Lead Id": {
+        "type": "str",
+        "description": "Unique identifier for the lead. When users ask a question regarding the count of leads you should count this column"
+    },
+    "Lead Cost": {
+        "type": "float",
+        "description": "Cost associated with the lead"
+    },
+    "Is Blend Lead": {
+        "type": "bit",
+        "description": "A binary value indicating whether or not the lead was generated using the Blend application flow. A value of 1 means that the lead was generated through Blend"
+    },
+    "Lead Source Name": {
+        "type": "str",
+        "description": "Name of the lead source"
+    },
+    "Created Date": {
+        "type": "datetime",
+        "description": "Date and time when the lead was created"
+    },
+    "Loan Officer Name": {
+        "type": "str",
+        "description": "Name of the loan officer or group associated with the lead"
+    },
+    "Branch Code": {
+        "type": "str",
+        "description": "Code representing which Branch the lead belongs to"
+    },
+    "Currently Renting": {
+        "type": "bit",
+        "description": "Indicator for whether the borrower is currently renting"
+    },
+    "Desired Loan Amount": {
+        "type": "float",
+        "description": "Desired loan amount by the lead"
+    },
+    "Desired Rate": {
+        "type": "float",
+        "description": "Desired interest rate"
+    },
+    "Desired Rate Type": {
+        "type": "str",
+        "description": "Type of desired interest rate (e.g., Fixed)"
+    },
+    "Desired Loan Term": {
+        "type": "int",
+        "description": "Desired term of the loan in months"
+    },
+    "Down Payment": {
+        "type": "float",
+        "description": "Down payment amount"
+    },
+    "DTI": {
+        "type": "float",
+        "description": "Debt-to-Income ratio of the lead"
+    },
+    "DTI Decision": {
+        "type": "int",
+        "description": "Qualification Decision related to Debt-to-Income ratio (e.g. accepted, denied)"
+    },
+    "Existing Mortgage Balance": {
+        "type": "float",
+        "description": "Balance of existing mortgage if one exists"
+    },
+    "Existing Mortgage Monthly Payment": {
+        "type": "float",
+        "description": "Monthly payment of existing mortgage if one exists"
+    },
+    "Existing Rate Type": {
+        "type": "str",
+        "description": "Type of interest rate of existing mortgage if one exists"
+    },
+    "First Time Home Buyer": {
+        "type": "int",
+        "description": "Indicator for whether the lead is a first-time home buyer"
+    },
+    "Has Bankruptcy": {
+        "type": "bit",
+        "description": "Indicator for whether the lead has a bankruptcy history"
+    },
+    "Has Foreclosure": {
+        "type": "bit",
+        "description": "Indicator for whether the lead has a foreclosure history"
+    },
+    "Intended Property Use": {
+        "type": "str",
+        "description": "Intended use of the property (e.g., Purchase)"
+    },
+    "Lead Type": {
+        "type": "str",
+        "description": "Type of lead (e.g., Mortgage Lead)"
+    },
+    "Desired Loan Purpose": {
+        "type": "str",
+        "description": "Purpose of the desired loan (e.g., Purchase)"
+    },
+    "Is VA Eligible": {
+        "type": "bit",
+        "description": "Indicator for VA loan eligibility"
+    },
+    "Needs Realtor": {
+        "type": "bit",
+        "description": "Indicator for whether the lead needs a realtor"
+    },
+    "New Home Value": {
+        "type": "float",
+        "description": "Value of the new home (i.e. the subject property)"
+    },
+    "Property State": {
+        "type": "str",
+        "description": "State where the property is located"
+    },
+    "Property City": {
+        "type": "str",
+        "description": "City where the property is located"
+    },
+    "Preferred Language": {
+        "type": "str",
+        "description": "Preferred language of the lead"
+    },
+    "Quoted Rate": {
+        "type": "float",
+        "description": "Quoted interest rate"
+    },
+    "Referral Source Details": {
+        "type": "str",
+        "description": "Name of the leads referral source"
+    },
+    "Refinance Type": {
+        "type": "str",
+        "description": "Type of refinance (e.g., CashoutRefinance)"
+    },
+    "Is Self Employed": {
+        "type": "bit",
+        "description": "Indicator for self-employment"
+    },
+    "Borrower State": {
+        "type": "str",
+        "description": "State of the borrower"
+    },
+    "UTM Campaign": {
+        "type": "str",
+        "description": "The name of the PPC campaign used to generate the lead"
+    },
+    "UTM Medium": {
+        "type": "str",
+        "description": "The medium of the PPC campaign used to generate the lead"
+    },
+    "UTM Source": {
+        "type": "str",
+        "description": "The source of the PPC campaign used to generate the lead"
+    },
+    "UTM Term": {
+        "type": "str",
+        "description": "The keyword of the PPC campaign used to generate the lead"
+    }
+}

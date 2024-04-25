@@ -1,0 +1,214 @@
+{
+    "Loan Number": {
+        "type": "str",
+        "description": "Unique identifier for the loan. The count of this value is often referred to as units. When users ask a question regarding the count of loans you should count this column",
+        "aliases": ["units"]
+    },
+    "Branch Code": {
+        "type": "str",
+        "description": "Code representing which Branch the loan belongs to"
+    },
+    "Loan Officer": {
+        "type": "str",
+        "description": "Name of the loan officer who owns the loan",
+        "aliases": ["LO"]
+    },
+    "Loan Amount": {
+        "type": "float",
+        "description": "Amount of the loan. The sum of this value is often referred to as volume",
+        "aliases": ["volume"]
+    },
+    "Started Date": {
+        "type": "date",
+        "description": "Date when the loan process started"
+    },
+    "Pre Approval Date": {
+        "type": "date",
+        "description": "Date when the loan was pre-approved. Loans with a non null pre approval date are referred to as 'pre approvals', 'pre apps', or 'preapps'"
+    },
+    "Has Pre Approval": {
+        "type": "bit",
+        "description": "a binary value indicating if a loan has been pre approved or not. A value of 1 means that the loan does have a pre approval"
+    },
+    "Application Date": {
+        "type": "date",
+        "description": "Date when the loan application was submitted. Loans with a non null application date are referred to as 'apps' or 'applications'"
+    },
+    "Has Application": {
+        "type": "bit",
+        "description": "a binary value indicating if a loan has an application or not. A value of 1 means that the loan does have an application"
+    },
+    "Lock Date": {
+        "type": "date",
+        "description": "Date when the interest rate was locked. Loans with a non null lock date are referred to as 'locks'"
+    },
+    "Has Rate Lock": {
+        "type": "bit",
+        "description":"a binary value indicating if a loan has a rate lock or not. A value of 1 means that the loan does have a rate lock"
+    },
+    "Closing Date": {
+        "type": "date",
+        "description": "Date when the loan closing occurred. If this date is not null then the loan is referred to as 'closed'"
+    },
+    "Is Closed": {
+        "type": "bit",
+        "description": "a binary value indicating if a loan is cloed or not. A value of 1 means that the loan is closed"
+    },
+    "Credit Score": {
+        "type": "int",
+        "description": "Credit score of the borrower",
+        "aliases": ["Fico", "Fico Score", "FICO"]
+    },
+    "DTI": {
+        "type": "float",
+        "description": "Debt-to-Income ratio of the borrower"
+    },
+    "LTV": {
+        "type": "float",
+        "description": "Loan-to-Value ratio"
+    },
+    "Last Completed Milestone": {
+        "type": "str",
+        "description": "Last milestone completed in the loan process"
+    },
+    "Underwriter Name": {
+        "type": "str",
+        "description": "Name of the underwriter handling the loan"
+    },
+    "Loan Processor": {
+        "type": "str",
+        "description": "Name of the loan processor"
+    },
+    "Buyers Agent Name": {
+        "type": "str",
+        "description": "Name of the buyer\"s agent for the loan"
+    },
+    "Sellers Agent Name": {
+        "type": "str",
+        "description": "Name of the seller\"s agent"
+    },
+    "Subject Property State": {
+        "type": "str",
+        "description": "State where the subject property is located"
+    },
+    "Subject Property City": {
+        "type": "str",
+        "description": "City where the subject property is located"
+    },
+    "Subject Property Type": {
+        "type": "str",
+        "description": "Type of the subject property (e.g., Condominium, 1 Unit)"
+    },
+    "Subject Property Purchase Price": {
+        "type": "float",
+        "description": "Purchase price of the subject property"
+    },
+    "Subject Property Appraised Value": {
+        "type": "float",
+        "description": "Appraised value of the subject property"
+    },
+    "Down Payment": {
+        "type": "float",
+        "description": "Down payment amount"
+    },
+    "Intended Property Use": {
+        "type": "str",
+        "description": "Intended use of the property (e.g., Primary Residence)"
+    },
+    "Lien Position": {
+        "type": "str",
+        "description": "Lien position of the loan"
+    },
+    "Loan Program": {
+        "type": "str",
+        "description": "Loan program name"
+    },
+    "Loan Program Type": {
+        "type": "str",
+        "description": "Type of the loan program (e.g., Conventional, FHA)"
+    },
+    "Loan Term": {
+        "type": "int",
+        "description": "Term of the loan in months"
+    },
+    "Loan Type": {
+        "type": "str",
+        "description": "Type of the loan (e.g., Conventional, FHA)"
+    },
+    "Rate Type": {
+        "type": "str",
+        "description": "Type of interest rate (e.g., Fixed)"
+    },
+    "Loan Purpose": {
+        "type": "str",
+        "description": "Purpose of the loan (e.g., Purchase)"
+    },
+    "Note Rate": {
+        "type": "float",
+        "description": "Interest rate on the loan"
+    },
+    "Denial Date": {
+        "type": "date",
+        "description": "Date that the loan was denied on if applicable. Loans with a non null denial date are referred to as 'denials' or 'denied'"
+    },
+    "Lead Detail": {
+        "type": "str",
+        "description": "Category of the lead associated with this loan (e.g. referral)"
+    },
+    "Outside Lead Source": {
+        "type": "str",
+        "description": "Source of lead outside the company"
+    },
+    "Self Employed": {
+        "type": "str",
+        "description": "Indicator for self-employment"
+    },
+    "Rate Lock Expiration Date": {
+        "type": "date",
+        "description": "Date when the rate lock expires"
+    },
+    "Annual Income": {
+        "type": "float",
+        "description": "Annual income of the borrower"
+    },
+    "Monthly Debts": {
+        "type": "float",
+        "description": "Monthly debts of the borrower"
+    },
+    "Greenlight Approval Date": {
+        "type": "date",
+        "description": "Date when greenlight approval was obtained. Loans with a non null greenlight approval date are referred to as 'greenlights'"
+    },
+    "Referral Name": {
+        "type": "str",
+        "description": "Name of the referrer"
+    },
+    "Primary Account Id": {
+        "type": "str",
+        "description": "ID associated with the primary borrower\"s account"
+    },
+    "Front End Net": {
+        "type": "float",
+        "description": "The net profit received from this loan prior to selling the loan on the secondary market"
+    },
+    "Back End Net": {
+        "type": "float",
+        "description": "The net profit received from this loan after selling to the secondary market"
+    },
+    "Loan Level Expenses": {
+        "type": "float",
+        "description": "The total fixed expenses for this loan. Includes costs such as credit pulls, verification of employment, and price variance"
+    },
+    "Loan Level Revenue": {
+        "type": "float",
+        "description": "The total fixed revenue for this loan. Includes costs such as credit pulls, verification of employment, and price variance"
+    },
+    "Commission Expenses": {
+        "type": "float",
+        "description": "The total amount of money paid towards commission on this loan"
+    },
+    "Total Profit": {
+        "type": "float",
+        "description": "The total profit made on this loan. It is equivalent to [Front End Net] + [Back End Net] + [Loan Level Expenses] + [Loan Level Revenue] + [Commission Expenses]"
+    }
+}

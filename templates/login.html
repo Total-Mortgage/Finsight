@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+    <meta charset='UTF-8'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+    <title>Login</title>
+    <link rel='stylesheet' type='text/css' href='/static/css/login.css'>
+</head>
+<body>
+    <div id='login-form'>
+        <h2>Welcome to the Total Mortgage DataBot</h2>
+        <button onclick='login()'>Login</button>
+    </div>
+
+    <script>
+        function login() {
+            window.location.href = 'https://totalmortgage.my.salesforce.com/services/oauth2/authorize?' +
+                'client_id=3MVG9g9rbsTkKnAXPpNzglp3tuSQx_.NnDVy378tuw_BIT5O22X3vLm3lgpkJUI28AMkXo3Vx0QHaNNy0dWQ3' +
+                '&redirect_uri=https://localhost:5000/chat' +
+                '&response_type=code';
+        }
+    </script>
+</body>
+</html>

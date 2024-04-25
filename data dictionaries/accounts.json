@@ -1,0 +1,10 @@
+{
+    "Account Id": {
+        "type": "str",
+        "description": "Unique identifier for a borrower's account"
+    },
+    "Attributed Lead Id": {
+        "type": "str",
+        "description": "Unique identifier for a lead associated with this borrower id"
+    }
+}

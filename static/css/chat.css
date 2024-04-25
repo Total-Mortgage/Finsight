@@ -1,0 +1,102 @@
+body {
+    font-family: Söhne, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Ubuntu, Cantarell, "Noto Sans", sans-serif, "Helvetica Neue", Arial, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+    background-color: #333; /* Dark gray background color */
+    color: #fff; /* White text color */
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    flex-wrap: wrap;
+}
+
+
+#chat-container {
+    height: 85vh;
+    width: 90%;
+    overflow-y: scroll;
+    border: 1px solid #555; /* Darker gray border */
+    padding: 10px;
+    background-color: #444; /* Slightly lighter gray background color */
+    margin-bottom: 10px;
+    border-radius: 10px; /* Rounded corners */
+    white-space: pre-wrap;
+}
+
+#chat-form {
+    display: flex;
+    flex-direction: column;
+    height: 10vh;
+    width: 90%;
+}
+
+#message-input {
+    flex: 1;
+    padding: 5px;
+    margin-bottom: 10px;
+    border: 1px solid #555; /* Darker gray border */
+    border-radius: 10px; /* Rounded corners */
+    background-color: #444; /* Slightly lighter gray background color */
+    color: #fff; /* White text color */
+    resize: none; /* Disable textarea resizing */
+    overflow: auto; /* Enable scrolling when content exceeds textarea height */
+    font-family: Söhne, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Ubuntu, Cantarell, "Noto Sans", sans-serif, "Helvetica Neue", Arial, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+}
+
+#message-input:focus {
+    outline: none;
+}
+
+#submit-button {
+    background-color: #013b56;
+    color: #fff;
+    padding: 5px 10px;
+    border: none;
+    cursor: pointer;
+    border-radius: 10px; /* Rounded corners */
+}
+
+#submit-button:hover {
+    background-color: #24587a;
+}
+
+.steps-taken-message {
+    color: white; 
+    font-family: "Söhne Mono", Monaco, "Andale Mono", "Ubuntu Mono", monospace !important;
+}
+
+.steps-taken-container {
+    background-color: black;
+    border-radius: 20px;
+}
+
+.message {
+    margin-bottom: 5px;
+}
+
+.loader-container {
+    text-align: center; /* Center-align the text */
+    margin-bottom: 20px; /* Add some space below the text */
+    top: 50%; /* Center the loader vertically */
+    left: 50%; /* Center the loader horizontally */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.loader {
+    border: 8px solid #f3f3f3; /* Light grey */
+    border-top: 8px solid #3498db; /* Blue */
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 1s linear infinite;
+    margin-top: 20px
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
