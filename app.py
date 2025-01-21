@@ -17,8 +17,8 @@ from langchain.agents import AgentExecutor, create_openai_tools_agent
 from langchain.tools import tool
 from langchain_openai import ChatOpenAI
 from langchain import hub
-from dotenv import load_dotenv
 from load_context import contextManager
+from dotenv import load_dotenv
 
 # loading env variables
 load_dotenv()

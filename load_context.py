@@ -3,6 +3,10 @@ import pandas as pd
 import json
 from sqlalchemy.engine import URL
 from sqlalchemy import create_engine
+from dotenv import load_dotenv
+
+# loading env variables
+load_dotenv()
 
 conn_str = 'DRIVER={ODBC Driver 17 for SQL Server};' \
                'SERVER=tmssql03.tmsdomain.com\\tmssql1;' \
