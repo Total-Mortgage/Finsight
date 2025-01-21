@@ -1,30 +1,30 @@
 import json
+import time
 import os
 import sys
 import requests
 import datetime
 import uuid
-import pandas as pd
+import boto3
 from flask_socketio import SocketIO
 from flask_session import Session
-from sqlalchemy.engine import URL
-from sqlalchemy import create_engine
 from typing import Union
 from llm_functions import dataToolsManager
 from flask import Flask, render_template, request, session
 from flask_restful import Api, Resource
-from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
+from langchain_core.messages import AIMessage, HumanMessage, SystemMessage, ToolMessage
 from langchain.agents import AgentExecutor, create_openai_tools_agent
 from langchain.tools import tool
 from langchain_openai import ChatOpenAI
 from langchain import hub
 from dotenv import load_dotenv
-
+from load_context import contextManager
 
 # loading env variables
-#load_dotenv()
+load_dotenv()
 
 app = Flask(__name__)
+
 app.secret_key = os.environ['session_secret_key']
 app.config['SESSION_PERMANENT'] = False
 app.config['SESSION_TYPE'] = 'filesystem'
@@ -32,32 +32,17 @@ Session(app)
 api = Api(app)
 socketio = SocketIO(app)
 
-conn_str = 'DRIVER={ODBC Driver 17 for SQL Server};' \
-               'SERVER=tmssql03.tmsdomain.com\\tmssql1;' \
-               'DATABASE=Salesforce_DW;' \
-               'UID=' + os.environ.get('db_user') + ';' \
-               'PWD=' + os.environ.get('db_pass')
-connection_url = URL.create('mssql+pyodbc', query={'odbc_connect': conn_str})
-engine = create_engine(connection_url)
+context_manager = contextManager('contexts')
 
-datasets={}
-data_dictionaries = {}
-for f_name in ['loans', 'leads']:
-    with open(f'queries/{f_name}.sql') as f:
-        datasets[f_name] = pd.read_sql(f.read(), engine)
-        print(datasets[f_name].memory_usage(deep=True).sum())
-    with open(f'data dictionaries/{f_name}.json') as f:
-        data_dictionaries[f_name] = json.load(f)    
+# def read_user_view() -> dataToolsManager:
+#     user_view = {i: pd.DataFrame(session['user_view'][i]) for i in session['user_view']}
+#     dataframe_manager = dataToolsManager(user_view)
+#     return dataframe_manager
 
-def read_user_view() -> dataToolsManager:
-    user_view = {i: pd.DataFrame(session['user_view'][i]) for i in session['user_view']}
-    dataframe_manager = dataToolsManager(user_view)
-    return dataframe_manager
-
-def write_user_view() -> None:
-    user_view = {i:datasets[i].to_dict('list') for i in datasets}
-    session['user_view'] = user_view
-    return
+# def write_user_view() -> None:
+#     user_view = {i:datasets[i].to_dict('list') for i in datasets}
+#     session['user_view'] = user_view
+#     return
 
 
 # defining llm tools
@@ -76,12 +61,37 @@ def select_base(dataset: str) -> str:
     dataframe_manager = dataToolsManager.instances[session['session_id']]
     resp = dataframe_manager.select_base(dataset)
     return resp
+
+def reset_view() -> str:
+    '''
+    Reset the current view and start from scratch. After calling this function you must select a new base dataset using the select_base function
+    '''
+    dataframe_manager = dataToolsManager.instances[session['session_id']]
+    dataframe_manager.select_base('loans')
+    return 'Dataset reset successfully'
+
+@tool
+def get_current_schema() -> dict:
+    '''
+    Retrieve the data dictionary for this dataset, and the list of available columns in the current view 
+    Parameters:
+    - dataset (str): The name of the dataset to set as the new base for the current view. Valid options are: "loans", "leads".
+    Returns:
+    - dict: A dictionary of the form {data_dictionary, current_columns}. where data_dictionary is of the form: {column_name: {type, description, aliases}}, and current_columns is a list of string column names
+    Example usage:
+    get_current_schema()
+    '''
+    dataframe_manager = dataToolsManager.instances[session['session_id']]
+    resp = dataframe_manager.get_current_schema()
+    return resp
+
 @tool
 def get_current_date() -> str:
     '''Returns the current date as a string in the following format: %Y-%m-%d'''
     dataframe_manager = dataToolsManager.instances[session['session_id']]
     resp = dataframe_manager.get_current_date()
     return resp
+
 @tool
 def get_current_view(n) -> list[dict]:
     '''
@@ -96,23 +106,24 @@ def get_current_view(n) -> list[dict]:
     dataframe_manager = dataToolsManager.instances[session['session_id']]
     resp = dataframe_manager.get_current_view(n)
     return resp
+
 @tool
 def filter_dataframe(column: str, condition: str, value: str) -> str:
     '''
     Filter the current view DataFrame based on a specified condition for a column.
     Parameters:
     - column (str): The name of the column to apply the filtering condition.
-    - condition (str): The filtering condition. Valid options are: '==', '!=', '>', '<', '>=', '<=', 'is null', 'not null', 'contains'.
+    - condition (str): The filtering condition. Valid options are: '==', '!=', '>', '<', '>=', '<=', 'contains', 'is_null', 'not_null'.
     - value (str): The value to compare against in the filtering condition.
     Example usage:
     getting rows where column is greater than 10:
     filter_dataframe('column_name', '>', 10)
+    
     getting rows where column is after 2023-01-01:
     filter_dataframe('column_name', '>' '2023-01-01')
-    getting rows where column is null:
-    filter_dataframe('column_name', 'is null', '')
-    getting rows where column is not null:
-    filter_dataframe('column_name', 'not null', '')
+    
+    getting non null records
+    filter_dataframe('column_name', 'not_null', '')
     '''    
     dataframe_manager = dataToolsManager.instances[session['session_id']]
     resp = dataframe_manager.filter_dataframe(column, condition, value)
@@ -130,10 +141,10 @@ def select_columns(columns: list[str]) -> str:
     resp = dataframe_manager.select_columns(columns)
     return resp
 @tool 
-def group_dataframe(groupby: list[str], agg_columns: list[str], aggregation: str) -> str:
+def aggregate_group(groupby: list[str], agg_columns: list[str], aggregation: str) -> str:
     '''
-    Group the current view by the columns in the group by list and apply the aggregation function to all other columns
-    Parameters:
+    Group the current view by the columns in the group by list and apply the aggregation function to all other columns. 
+    WARNING: This operation edits the current_view in place and will drop columns
     - groupby (list[str]): A list of column names by which to group the DataFrame.
     - agg_columns (list[str]): A list of column names by which to aggregate over the specified groups
     - aggregation (str): The aggregation function to apply to each group. Valid options are: 'min', 'max', 'sum', 'count', 'mean', 'median', 'std', 'nunique'.
@@ -143,7 +154,7 @@ def group_dataframe(groupby: list[str], agg_columns: list[str], aggregation: str
     group_dataframe(groupby=['Branch Code'], agg_columns=['Subject Property State'], 'nunique')
     '''
     dataframe_manager = dataToolsManager.instances[session['session_id']]
-    resp = dataframe_manager.group_dataframe(groupby, agg_columns, aggregation)
+    resp = dataframe_manager.aggregate_group(groupby, agg_columns, aggregation)
     return resp
 @tool
 def join_dataframe_to_current_view(dataset: str, col_1: str, col_2: str, how: str) -> str:
@@ -270,25 +281,23 @@ Today's date is {datetime.datetime.now().strftime('%Y-%m-%d')}
 Each record in the loans table represents a single loan and is uniquely identified by the 'Loan Number' column
 Each record in the leads table represents a single lead and is uniquely identified by the 'Lead Id' column.
 
-Please Note: that in our sales funnel a lead and an application are distinct objects. When a user asks for applications they are referring to loan records with a non null Application Date, when a user asks for leads they are referring to lead records with a non null Created Date
+here are data dictionaries for each of the respective datasets
 
-Here are data dictionaries for each of the tables:
+loans: {context_manager.data_dictionaries['loans']}
 
-loans = {json.dumps(data_dictionaries['loans'])}
-
-leads = {json.dumps(data_dictionaries['leads'])}
+leads: {context_manager.data_dictionaries['leads']}
 '''
 
 # collecting tools
-tools = [select_base, get_current_view, select_columns, get_current_date, join_dataframe_to_current_view, filter_dataframe, group_dataframe, extract_datepart, create_custom_column_from_columns, create_custom_column_from_value, aggregate_column, get_top_n]
+tools = [select_base, get_current_view, get_current_schema, select_columns, get_current_date, filter_dataframe, aggregate_group, extract_datepart, create_custom_column_from_columns, create_custom_column_from_value, aggregate_column, get_top_n]
 
 
 prompt = hub.pull('hwchase17/openai-tools-agent')
 
 # loading chat agent
-llm = ChatOpenAI(model='gpt-3.5-turbo-0125', organization='org-3xZIlg8TIVWf5J0rRTNGlIvt', temperature=.3)
+llm = ChatOpenAI(model='gpt-3.5-turbo-0125', organization='org-3xZIlg8TIVWf5J0rRTNGlIvt', temperature=0)
 agent = create_openai_tools_agent(llm, tools, prompt)
-agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=True, return_intermediate_steps=True)
+agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=True, return_intermediate_steps=True, )
 
 @app.route('/')
 def login():
@@ -300,8 +309,57 @@ def chatwindow():
 
 @socketio.on('disconnect')
 def delete_session():
-    del dataToolsManager.instances[session['session_id']]
+    try:
+        del dataToolsManager.instances[session['session_id']]
+    except KeyError:
+        print(f'{session['session_id']} not found in data manager')
     return
+
+# Initialize the CloudWatch Logs client
+cloudwatch_client = boto3.client('logs')
+
+# Define your log group and log stream names
+LOG_GROUP_NAME = "finsight-messages"
+
+def log_to_cloudwatch(message, user_id, session_id):
+    """Log a message to CloudWatch in the format 'user_id/session_id/timestamp'."""
+    try:
+        # Construct log stream name using user_id, session_id, and a timestamp
+        timestamp = int(time.time() * 1000)  # Current time in milliseconds
+        log_stream_name = f"{user_id}/{session_id}"
+
+        # Ensure the log stream exists
+        response = cloudwatch_client.describe_log_streams(
+            logGroupName=LOG_GROUP_NAME,
+            logStreamNamePrefix=log_stream_name
+        )
+        log_streams = response.get('logStreams', [])
+        if not log_streams:
+            # Create the log stream if it doesn't exist
+            cloudwatch_client.create_log_stream(
+                logGroupName=LOG_GROUP_NAME,
+                logStreamName=log_stream_name
+            )
+            sequence_token = None
+        else:
+            sequence_token = log_streams[0].get('uploadSequenceToken', None)
+
+        # Log the message
+        log_event = {
+            'logGroupName': LOG_GROUP_NAME,
+            'logStreamName': log_stream_name,
+            'logEvents': [{
+                'timestamp': timestamp,  # Current time in milliseconds
+                'message': message
+            }]
+        }
+        if sequence_token:
+            log_event['sequenceToken'] = sequence_token
+
+        cloudwatch_client.put_log_events(**log_event)
+    except Exception as e:
+        print(f"Error logging to CloudWatch: {e}")
+
 
 class chat(Resource):
     def post(self):
@@ -311,32 +369,55 @@ class chat(Resource):
             messages = data['messages']
         except KeyError:
             return app.response_class(response=json.dumps({'error': 'messages not found'}), status=400, mimetype='application/json')
-        
+
         input_message = messages.pop()
+        user = dataToolsManager.instances[session['session_id']].user
 
         input_data = {
             'input': input_message,
-            'chat_history': [SystemMessage(system_prompt)]
+            'chat_history': [SystemMessage(system_prompt + f'\n\n Here is the current user\'s information: {user}')]
         }
 
         for message in messages:
-            if message['source'] == 'You':
+            if 'source' in message and message['source'] == 'You':
                 input_data['chat_history'].append(HumanMessage(message['message']))
             else:
-                input_data['chat_history'].append(AIMessage(message['message']))
-        
+                if 'tool_calls' in message:
+                    input_data['chat_history'].append(AIMessage(message['message'], tool_calls=message['tool_calls'], tool_messages=message['tool_messages']))
+                    for call in message['tool_calls']:
+                        input_data['chat_history'].append(ToolMessage(message['tool_messages'][call['id']], tool_call_id=call['id']))
+                else:
+                    input_data['chat_history'].append(AIMessage(message['message']))
+
+        print(input_data, file=sys.stderr)
         output = agent_executor.invoke(input_data)
         intermediate_steps = output['intermediate_steps']
         final_message = output['output']
-        
+        reset_view()
+        # Generate steps_taken_message if intermediate_steps exist
+        steps_taken_message = ''
+        tool_calls = []
+        tool_messages = {}
         if intermediate_steps:
-            steps_taken_message = '''   Steps Taken: \n'''
+            steps_taken_message = '''Steps Taken:\n'''
+            tool_calls = intermediate_steps[0][0].message_log[0].tool_calls
             for step in intermediate_steps:
                 steps_taken_message += '\t' + step[0].log.replace('\n', '') + '\n\t' + step[1] + '\n\n'
-            return app.response_class(response=json.dumps({'source': 'AI', 'message': final_message, 'steps_taken': steps_taken_message}), status=200, mimetype='application/json')
-        
+                tool_messages[step[0].tool_call_id] = step[0].log.replace('\n', '') + '\n\t' + step[1] + '\n\n'
+        # Log messages to CloudWatch
+        user_id = session['user_id']
+        session_id = session['session_id']
+        log_to_cloudwatch(f"Input Message: {input_message['message']}", user_id, session_id)
+        if steps_taken_message:
+            log_to_cloudwatch(f"Steps Taken Message: {steps_taken_message}", user_id, session_id)
+        log_to_cloudwatch(f"Final Message: {final_message}", user_id, session_id)
+
+        # Respond to the client
+        if steps_taken_message:
+            return app.response_class(response=json.dumps({'source': 'AI', 'message': final_message, 'steps_taken': steps_taken_message, 'tool_calls': tool_calls, 'tool_messages': tool_messages}), status=200, mimetype='application/json')
         else:
             return app.response_class(response=json.dumps({'source': 'AI', 'message': final_message}), status=200, mimetype='application/json')
+
 
 class auth(Resource):
     def post(self):
@@ -359,12 +440,25 @@ class auth(Resource):
             user_id = resp.json()['user_id']
 
             resp = requests.get('https://totalmortgage.my.salesforce.com/services/data/v60.0/sobjects/User/' + user_id, headers={'Authorization': 'Bearer ' + access_token})
-            branch_code = resp.json()['Branch_Code__c']
+            resp_data = resp.json()
+            print(resp_data, file=sys.stderr)
+            branch_code = resp_data['Branch_Code__c']
 
-            user_view = {i:datasets[i][datasets[i]['Branch Code'] == branch_code] for i in datasets}
+            if branch_code == 'DEV':
+                user_view = context_manager.datasets
+            else:
+                user_view = {i:context_manager.datasets[i][context_manager.datasets[i]['Branch Code'] == branch_code] for i in context_manager.datasets}
+
             session_id = uuid.uuid4()
             session['session_id'] = session_id
-            dataToolsManager(user_view, session_id)
+            session['user_id'] = user_id
+
+            user = {
+                'name': resp_data['Name'],
+                'branch_code': branch_code,
+                'nmls': resp_data['NMLS_Id__c']
+            }
+            dataToolsManager(context_manager.data_dictionaries, user_view, session_id, user)
             return app.response_class(status=200, mimetype='application/json')
 
 # adding api resources

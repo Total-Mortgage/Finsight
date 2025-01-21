@@ -2,21 +2,30 @@
     "Loan Number": {
         "type": "str",
         "description": "Unique identifier for the loan. The count of this value is often referred to as units. When users ask a question regarding the count of loans you should count this column",
-        "aliases": ["units"]
+        "aliases": [
+            "units"
+        ]
     },
     "Branch Code": {
         "type": "str",
-        "description": "Code representing which Branch the loan belongs to"
+        "description": "Code representing which Branch the loan belongs to",
+        "aliases": [
+            "branch"
+        ]
     },
     "Loan Officer": {
         "type": "str",
         "description": "Name of the loan officer who owns the loan",
-        "aliases": ["LO"]
+        "aliases": [
+            "LO"
+        ]
     },
     "Loan Amount": {
         "type": "float",
         "description": "Amount of the loan. The sum of this value is often referred to as volume",
-        "aliases": ["volume"]
+        "aliases": [
+            "volume"
+        ]
     },
     "Started Date": {
         "type": "date",
@@ -26,38 +35,42 @@
         "type": "date",
         "description": "Date when the loan was pre-approved. Loans with a non null pre approval date are referred to as 'pre approvals', 'pre apps', or 'preapps'"
     },
-    "Has Pre Approval": {
-        "type": "bit",
-        "description": "a binary value indicating if a loan has been pre approved or not. A value of 1 means that the loan does have a pre approval"
+    "Pre Approval Volume": {
+        "type": "float",
+        "description": "float representing the loan amount at Pre Approval time. The definition is: if Pre Approval Date is not null then Loan Amount else null"
     },
     "Application Date": {
         "type": "date",
         "description": "Date when the loan application was submitted. Loans with a non null application date are referred to as 'apps' or 'applications'"
     },
-    "Has Application": {
-        "type": "bit",
-        "description": "a binary value indicating if a loan has an application or not. A value of 1 means that the loan does have an application"
+    "Application Volume": {
+        "type": "float",
+        "description": "float representing the loan amount at application time. The definition is: if Application Date is not null then Loan Amount else null"
     },
     "Lock Date": {
         "type": "date",
         "description": "Date when the interest rate was locked. Loans with a non null lock date are referred to as 'locks'"
     },
-    "Has Rate Lock": {
-        "type": "bit",
-        "description":"a binary value indicating if a loan has a rate lock or not. A value of 1 means that the loan does have a rate lock"
+    "Lock Volume": {
+        "type": "float",
+        "description": "float representing the loan amount at rate lock time. The definition is: if Lock Date is not null then Loan Amount else null"
     },
     "Closing Date": {
         "type": "date",
         "description": "Date when the loan closing occurred. If this date is not null then the loan is referred to as 'closed'"
     },
-    "Is Closed": {
-        "type": "bit",
-        "description": "a binary value indicating if a loan is cloed or not. A value of 1 means that the loan is closed"
+    "Closed Volume": {
+        "type": "float",
+        "description": "float representing the loan amount at closing time. The definition is: if Closing Date is not null then Loan Amount else null"
     },
     "Credit Score": {
         "type": "int",
         "description": "Credit score of the borrower",
-        "aliases": ["Fico", "Fico Score", "FICO"]
+        "aliases": [
+            "Fico",
+            "Fico Score",
+            "FICO"
+        ]
     },
     "DTI": {
         "type": "float",
@@ -86,6 +99,10 @@
     "Sellers Agent Name": {
         "type": "str",
         "description": "Name of the seller\"s agent"
+    },
+    "Subject Property Street": {
+        "type": "str",
+        "description": "Street Address where the subject property is located"
     },
     "Subject Property State": {
         "type": "str",
@@ -121,7 +138,7 @@
     },
     "Loan Program": {
         "type": "str",
-        "description": "Loan program name"
+        "description": "Internal loan program name/code"
     },
     "Loan Program Type": {
         "type": "str",
@@ -194,21 +211,5 @@
     "Back End Net": {
         "type": "float",
         "description": "The net profit received from this loan after selling to the secondary market"
-    },
-    "Loan Level Expenses": {
-        "type": "float",
-        "description": "The total fixed expenses for this loan. Includes costs such as credit pulls, verification of employment, and price variance"
-    },
-    "Loan Level Revenue": {
-        "type": "float",
-        "description": "The total fixed revenue for this loan. Includes costs such as credit pulls, verification of employment, and price variance"
-    },
-    "Commission Expenses": {
-        "type": "float",
-        "description": "The total amount of money paid towards commission on this loan"
-    },
-    "Total Profit": {
-        "type": "float",
-        "description": "The total profit made on this loan. It is equivalent to [Front End Net] + [Back End Net] + [Loan Level Expenses] + [Loan Level Revenue] + [Commission Expenses]"
     }
 }

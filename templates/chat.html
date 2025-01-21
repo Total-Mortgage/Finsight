@@ -1,38 +1,44 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Total Mortgage AI</title>
     <link rel="stylesheet" type="text/css" href="/static/css/chat.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"
+        integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA=="
+        crossorigin="anonymous"></script>
     <script type="text/javascript" charset="utf-8">
-    var socket = io();
-    socket.on('connect', function() {
-        socket.emit('my event', {data: 'I\'m connected!'});
-    });
+        var socket = io();
+        socket.on('connect', function () {
+            socket.emit('my event', { data: 'I\'m connected!' });
+        });
     </script>
 </head>
+
 <body>
 
-<div class="loader-container">
-    <p>Please wait while we fetch your data</p>
+    <div class="loader-container">
+        <p>Please wait while we fetch your data</p>
 
 
-<div id="loading-spinner" class="loader"></div>
-</div>
+        <div id="loading-spinner" class="loader"></div>
+    </div>
 
+    <div id="conversation-container">
+        <div id="chat-container">
+            <div id="chat-window"></div>
+        </div>
+        <form id="chat-form">
 
-<div id="chat-container">
-    <div id="chat-window"></div>
-</div>
+            <textarea id="message-input" placeholder="Type your message..."></textarea>
+            <button type="submit" id="submit-button">Submit</button>
+        </form>
+    </div>
 
-<form id="chat-form">
-    <textarea id="message-input" placeholder="Type your message..."></textarea>
-    <button type="submit" id="submit-button">Submit</button>
-</form>
-
-<script src="/static/js/chat.js"></script>
+    <script src="/static/js/chat.js"></script>
 
 </body>
+
 </html>

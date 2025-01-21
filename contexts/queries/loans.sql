@@ -1,6 +1,3 @@
-select elpl.*, c.[Commission Expenses], elpl.[Back End Net] + elpl.[Front End Net] + elpl.[Loan Level Expenses] + elpl.[Loan Level Revenue] + c.[Commission Expenses] as [Total Profit] from(
-select el.*, pl.[Loan Level Expenses], pl.[Loan Level Revenue] from(
-
 SELECT 
 Encompass_Loan_Number__c AS [Loan Number], 
 Branch_Code__c AS [Branch Code], 
@@ -8,16 +5,12 @@ Loan_Officer__c AS [Loan Officer],
 Loan_Amount__c AS [Loan Amount], 
 cast(Encompass_File_Started_Date__c as Date) AS [Started Date], 
 cast(Pre_Approval_Initial_Print_Date__c as Date) AS [Pre Approval Date], 
-case when Pre_Approval_Initial_Print_Date__c is not null then 1 else 0 end as [Has Pre Approval],
 case when Pre_Approval_Initial_Print_Date__c is not null then Loan_Amount__c else 0 end as [Pre Approval Volume],
 cast(Application_Taken_Date__c as Date) AS [Application Date], 
-case when Application_Taken_Date__c is not null then 1 else 0 end as [Has Application],
 case when Application_Taken_Date__c is not null then Loan_Amount__c else 0 end as [Application Volume],
 cast(Lock_Date__c as Date) AS [Lock Date], 
-case when Lock_Date__c is not null then 1 else 0 end as [Has Rate Lock],
 case when Lock_Date__c is not null then Loan_Amount__c else 0 end as [Lock Volume],
 cast(Closing_Completion_Date__c as Date) AS [Closing Date],
-case when Closing_Completion_Date__c is not null then 1 else 0 end as [Is Closed],
 case when Closing_Completion_Date__c is not null then Loan_Amount__c else 0 end as [Closed Volume],
 Credit_Score__c AS [Credit Score],
 DTI__c AS [DTI],
@@ -27,6 +20,7 @@ Underwriter_Name__c AS [Underwriter Name],
 Loan_Processor__c AS [Loan Processor],
 BUYERS_AGENT_CONTACT_NAME_VEND_X139 AS [Buyers Agent Name],
 Sellers_Agent_Name__c AS [Sellers Agent Name],
+Subject_Property_Street__c as [Subject Property Street],
 Subject_Property_State__c AS [Subject Property State],
 Subject_Property_City__c AS [Subject Property City],
 Subject_Property_Type__c AS [Subject Property Type],
@@ -59,53 +53,3 @@ FROM
 EL_JoinedToEncompassHigh
 
 where year(Encompass_File_Started_Date__c) >= 2020
-) el
-
-left join 
-
-(
-select e.Encompass_Loan_Number__c, e.[Loan Level Expenses], r.[Loan Level Revenue] from(
-
-(select Encompass_Loan_Number__c, sum(p.Amount) as [Loan Level Expenses]
-
-from EL_JoinedToEncompassHigh e
-
-left join AMB_DW.dbo.PandL_Revenue_Expenses_March_2022_Itemized_Final p
-
-on e.Encompass_Loan_Number__c = p.LOANNUMB
-where type='Expenses'
-group by Encompass_Loan_Number__c
-) e
-
-left join 
-
-(
-select Encompass_Loan_Number__c, sum(p.Amount) as [Loan Level Revenue]
-
-from EL_JoinedToEncompassHigh e
-
-left join AMB_DW.dbo.PandL_Revenue_Expenses_March_2022_Itemized_Final p
-
-on e.Encompass_Loan_Number__c = p.LOANNUMB
-where type='Revenue'
-group by Encompass_Loan_Number__c
-) r
-
-on e.Encompass_Loan_Number__c = r.Encompass_Loan_Number__c
-)
-) pl 
-
-on el.[Loan Number] = pl.Encompass_Loan_Number__c
-) elpl
-
-left join 
-
-(
-select LOANNUMBER, sum(amount) * -1 as [Commission Expenses]
-
-from Coldstorage.dbo.Compensafe_CombinedBonus_Commission
-
-group by LOANNUMBER
-) c
-
-on elpl.[Loan Number] = c.LOANNUMBER

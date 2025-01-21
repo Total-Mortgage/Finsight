@@ -25,7 +25,10 @@
     },
     "Branch Code": {
         "type": "str",
-        "description": "Code representing which Branch the lead belongs to"
+        "description": "Code representing which Branch the lead belongs to",
+        "aliases": [
+            "branch"
+        ]
     },
     "Currently Renting": {
         "type": "bit",

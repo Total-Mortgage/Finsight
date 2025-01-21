@@ -1,11 +1,13 @@
 import pandas as pd
-import uuid
+import datetime
 from datetime import date
 
 class dataToolsManager:
     instances = {}
-    def __init__(self,  datasets, sid) -> None:
+    def __init__(self, data_dictionaries,  datasets, sid, user) -> None:
         self.datasets = datasets
+        self.data_dictionaries = data_dictionaries
+        self.user = user
 
         self.convert_dates()
         self.current_view = None
@@ -17,8 +19,9 @@ class dataToolsManager:
         for dataset_name in self.datasets:
             for column in self.datasets[dataset_name].columns:
                 if 'Date' in column:
-                    self.datasets[dataset_name].loc[:, column] = pd.to_datetime(self.datasets[dataset_name][column])
-    
+                    print(f'Converting {column} to date')
+                    self.datasets[dataset_name][column] = pd.to_datetime(self.datasets[dataset_name][column])
+
     def convert_input_type(self, col, value):
         col_dtype = self.current_view[col].dtype
 
@@ -32,11 +35,12 @@ class dataToolsManager:
             converted_value = bool(value)
         elif pd.api.types.is_string_dtype(col_dtype):
             converted_value = str(value)
-        elif pd.api.types.is_datetime64_any_dtype(col_dtype):
+        elif pd.api.types.is_datetime64_any_dtype(col_dtype) or 'Date' in col:
             converted_value = pd.to_datetime(value)
         else:
+            print('Here')
             converted_value = value
-        
+
         return converted_value
 
     def select_base(self, dataset):
@@ -47,7 +51,7 @@ class dataToolsManager:
         self.current_view = self.datasets[dataset]
         self.base_name = dataset
 
-        return 'view reset to ' + dataset
+        return f'view reset to {dataset}. The dataset contains {dataset} information ranging from 2020-01-01 to {datetime.datetime.now().strftime('%Y-%m-%d')}'
     
     def get_current_date(self):
         return date.today().strftime('%Y-%m-%d')
@@ -57,15 +61,22 @@ class dataToolsManager:
             return str(self.current_view.to_dict(orient='records'))
         else:
             return str(self.current_view.head(n).to_dict(orient='records'))
+        
+    def get_current_schema(self):
+        data_dictionary = self.data_dictionaries[self.base_name]
+        cols = self.current_view.columns
+        schema = {}
+        for item in cols:
+            schema[item] = data_dictionary[item]
+        return f'Here is the schema of the current view: \n\n{schema}'
 
     def filter_dataframe(self, column: str, condition: str, value: str) -> None:
         if column not in self.current_view.columns:
-            return column + ' is not in the current view'
-        if value != '':
+            return 'There was an error, Message: ' + column + ' is not a valid column in the current view'
+        if value != '' and pd.notna(value):
             converted_value = self.convert_input_type(column, value)
         else:
             converted_value = value
-        
         operators = {
             '==': lambda x: x == converted_value,
             '!=': lambda x: x != converted_value,
@@ -73,18 +84,15 @@ class dataToolsManager:
             '<': lambda x: x != None and x < converted_value,
             '>=': lambda x: x != None and x >= converted_value,
             '<=': lambda x: x != None and x <= converted_value,
-            'not null': lambda x: pd.isna(x) == False,
-            'is null' : lambda x: pd.isna(x) == True,
-            'contains': lambda x: str(x).lower().find(converted_value.lower()) != -1
+            'contains': lambda x: str(x).lower().find(converted_value.lower()) != -1,
+            'is_null': lambda x: pd.isna(x),
+            'not_null': lambda x: not pd.isna(x)
         }
         
         if condition not in operators:
-            return 'There was an error, Message: ' + condition + ' is not a valid condition. it must be one of: "==", "!=", ">", "<", ">=", "<=", "is null", "not null", "contains" '
-        
-        if pd.api.types.is_string_dtype(self.current_view[column].dtype):
-            condition_operator = lambda x: str(x).lower() == converted_value.lower()
-        else:
-            condition_operator = operators[condition]
+            return 'There was an error, Message: "' + condition + '" is not a valid condition. it must be one of: "==", "!=", ">", "<", ">=", "<=", "contains", "is_null", "not_null" '
+
+        condition_operator = operators[condition]
 
         self.current_view = self.current_view[self.current_view[column].apply(condition_operator)]
         return f'The current view was filtered successfully. There are {len(self.current_view)} {self.base_name} remaining in the current view'
@@ -96,7 +104,7 @@ class dataToolsManager:
         self.current_view = self.current_view[columns]
         return f'Success, the remaining columns in the current view are: {self.current_view.columns}. Continue transforming the current view, or use the get_current_view tool to view the selected data'
 
-    def group_dataframe(self, groupby: list[str], agg_columns: list[str], aggregation: str):
+    def aggregate_group(self, groupby: list[str], agg_columns: list[str], aggregation: str):
         for col in groupby:
             if col not in self.current_view.columns:
                 return 'There was an error, Message: ' + col + ' in groupby is not in the current view'
@@ -109,7 +117,7 @@ class dataToolsManager:
         self.current_view = self.current_view[[*groupby, *agg_columns]].groupby(by=groupby).agg(aggregation).reset_index()
         
         
-        return f'Success, the current view has been grouped by: {groupby}, and the columns: {agg_columns} have been aggregated using the {aggregation} function. Continue transforming the current view, or use the get_top_n function to retrieve the desired results.'
+        return f'Success, the current view has been grouped by: {groupby}, and the columns: {agg_columns} have been aggregated using the {aggregation} function. The remaining columns in the current view are: {self.current_view.columns}. Continue transforming the current view, or use the get_top_n function to retrieve the desired results.'
 
     def join_loans_to_leads(self):
         if 'Lead Id' not in self.current_view.columns:
