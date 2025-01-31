@@ -32,7 +32,7 @@ Session(app)
 api = Api(app)
 socketio = SocketIO(app)
 
-context_manager = contextManager('contexts')
+context_manager = contextManager('contexts', 1.5, .75, 1, 1)
 
 # def read_user_view() -> dataToolsManager:
 #     user_view = {i: pd.DataFrame(session['user_view'][i]) for i in session['user_view']}
@@ -289,7 +289,7 @@ leads: {context_manager.data_dictionaries['leads']}
 '''
 
 # collecting tools
-tools = [select_base, get_current_view, get_current_schema, select_columns, get_current_date, filter_dataframe, aggregate_group, extract_datepart, create_custom_column_from_columns, create_custom_column_from_value, aggregate_column, get_top_n]
+tools = [select_base, get_current_view, get_current_schema, select_columns, get_current_date, filter_dataframe, extract_datepart, create_custom_column_from_columns, create_custom_column_from_value, aggregate_column, get_top_n]
 
 
 prompt = hub.pull('hwchase17/openai-tools-agent')
@@ -372,6 +372,19 @@ class chat(Resource):
 
         input_message = messages.pop()
         user = dataToolsManager.instances[session['session_id']].user
+
+        context = context_manager.search(input_message['message'], 1, 3, 40)
+
+        context_message = f'''
+        Here are the relevant pieces of context we found in our knowledge base regarding the users request:
+        Definitions:
+        {json.dumps(context['definitions'], default=str, indent=4) if 'definitions' in context else 'No relevant definitions found'}
+
+        Prompts:
+        {json.dumps(context['prompts'], default=str, indent=4) if 'prompts' in context else 'No relevant prompts found'}
+        '''
+
+        input_message['message'] += '\n\n' + context_message
 
         input_data = {
             'input': input_message,

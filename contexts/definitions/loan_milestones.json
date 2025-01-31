@@ -1,33 +1,37 @@
 {
-    "started": {
-        "definition": "This refers to loans that have a non-null Start Date",
-        "description": "In order for a loan to exist, and thus have a start date, it must have been setup in the Encompass Loan Origination system",
-        "aliases": [
-            "loans"
-        ]
-    },
-    "application": {
-        "definition": "An application is any loan with a non-null Application Date",
-        "description": "Importantly, applications are not the same as leads. Applications occur much further along in the sales process, specifically when the borrower has filled out and submitted a formal mortgage application",
-        "aliases": [
-            "apps"
-        ]
-    },
-    "preapproval": {
-        "definition": "A preapproved loan is one that has completed one of our preapproval funnels (such as our apply page) and has been sent a preapproval letter",
-        "description": "Preapproval letters are generally sent after the user completes one of our preliminary qualification steps. It contains info such as how much money the borrower is approved for",
-        "aliases": [
-            "preapps",
-            "pre-apps",
-            "pre-approvals",
-            "prequals",
-            "prequalifications",
-            "pre-quals"
-        ]
-    },
-    "closed": {
-        "definition": "Closed loans are loans with a non-null Closing Date",
-        "description": "Closing time is ultimately when the company receives revenue for the loan. Most people will care about this group",
-        "aliases": []
+    "title": "Loan Milestones",
+    "description": "Loan milestones represent key points along the lifetime of a loan. Often our users want to filter the dataset using these milestones",
+    "definitions": {
+        "started": {
+            "definition": "This refers to loans that have a non-null Start Date",
+            "description": "In order for a loan to exist, and thus have a start date, it must have been setup in the Encompass Loan Origination system",
+            "aliases": [
+                "loans"
+            ]
+        },
+        "application": {
+            "definition": "An application is any loan with a non-null Application Date",
+            "description": "Importantly, applications are not the same as leads. Applications occur much further along in the sales process, specifically when the borrower has filled out and submitted a formal mortgage application",
+            "aliases": [
+                "apps"
+            ]
+        },
+        "preapproval": {
+            "definition": "A preapproved loan is one that has completed one of our preapproval funnels (such as our apply page) and has been sent a preapproval letter",
+            "description": "Preapproval letters are generally sent after the user completes one of our preliminary qualification steps. It contains info such as how much money the borrower is approved for",
+            "aliases": [
+                "preapps",
+                "pre-apps",
+                "pre-approvals",
+                "prequals",
+                "prequalifications",
+                "pre-quals"
+            ]
+        },
+        "closed": {
+            "definition": "Closed loans are loans with a non-null Closing Date",
+            "description": "Closing time is ultimately when the company receives revenue for the loan. Most people will care about this group",
+            "aliases": []
+        }
     }
 }

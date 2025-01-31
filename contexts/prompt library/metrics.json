@@ -1,18 +1,22 @@
 {
-    "closed_units": {
-        "description": "this refers to the count of loan numbers with a non null 'Closing Date'",
-        "aliases": [
-            "closed loans",
-            "closed units",
-            "loans closed",
-            "closings"
-        ],
-        "relevant_functions": [
-            "select_base",
-            "filter_dataframe",
-            "aggregate"
-        ],
-        "example_prompt": "how many closed units did the BRC branch have in 2024",
-        "example_solution": "select_base('loans'), filter_dataframe('Closing Date', '>=', '2024-01-01'), filter_dataframe('Closing Date', '<=', '2024-12-31'), aggregate('count')"
+    "title": "Common Loan metrics and calculations",
+    "description": "This library contains prompts about various metrics that are commonly calculated and requested by our users",
+    "prompts": {
+        "closed_units": {
+            "description": "this refers to the count of loan numbers with a non null 'Closing Date'",
+            "aliases": [
+                "closed loans",
+                "closed units",
+                "loans closed",
+                "closings"
+            ],
+            "relevant_functions": [
+                "select_base",
+                "filter_dataframe",
+                "aggregate"
+            ],
+            "example_prompt": "how many closed units did the BRC branch have in 2024",
+            "example_solution": "select_base('loans'), filter_dataframe('Closing Date', '>=', '2024-01-01'), filter_dataframe('Closing Date', '<=', '2024-12-31'), aggregate('count')"
+        }
     }
 }

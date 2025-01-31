@@ -1,1 +1,13 @@
-{}
+{
+    "title": "Branch Codes",
+    "description": "Branch codes are short alphabetical identifiers for uniquely identifying our companies branches",
+    "definitions": {
+        "BRC": {
+            "definition": "the Brockton, CT branch",
+            "description": "branch code BRC managed by Jorge Dossantos",
+            "aliases": [
+                "Brockton"
+            ]
+        }
+    }
+}
