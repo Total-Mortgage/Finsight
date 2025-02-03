@@ -43,6 +43,32 @@ class contextManager:
         self.prompt_library = {}
         self.definitions = {}
 
+        # Updating Branch Definitions
+        branch_query = '''SELECT 
+        d.name,
+        max(b.name) as main_name,
+        string_agg(b.Name, ',')  as aliases,
+        max(e.Name) as manager_name
+
+        FROM [Salesforce_Internal].[dbo].[Branch] b
+        inner join Salesforce_Internal.dbo.Division d
+        on b.Branch_Code__c = d.Id
+        left join Salesforce_Internal.dbo.Employee e
+        on d.Division_Code_Manager__c = e.Id
+
+        where d.Is_Active__c = 1
+
+        group by d.Name'''
+
+        branches = pd.read_sql(branch_query, engine)
+        with open(f'{self.root}/definitions/branch_codes.json', 'r') as f:
+            branch_definitions = json.load(f)
+            for branch in branches.iterrows():
+                branch_definitions['definitions'][branch[1]['name']] = {'definition': f'The {branch[1]['main_name']} branch', 'description': f'branch code {branch[1]['name']}, managed by {branch[1]['manager_name']}', 'aliases': branch[1]['aliases'].split(',')}
+
+        with open(f'{self.root}/definitions/branch_codes.json', 'w+') as f:
+            json.dump(branch_definitions, f)
+
         # Loading datasets and data dicts
         f_names = [i.split('.')[0] for i in os.listdir(f'{self.root}/data dictionaries')]
         for f_name in f_names:

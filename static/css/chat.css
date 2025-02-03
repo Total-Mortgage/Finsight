@@ -120,6 +120,7 @@ body {
     color: white;
     padding: 10px;
     font-family: "Söhne Mono", Monaco, "Andale Mono", "Ubuntu Mono", monospace !important;
+    overflow: auto;
 }
 
 .steps-taken-container {

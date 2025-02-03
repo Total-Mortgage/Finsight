@@ -56,11 +56,8 @@ class dataToolsManager:
     def get_current_date(self):
         return date.today().strftime('%Y-%m-%d')
     
-    def get_current_view(self, n) -> pd.DataFrame:
-        if n == 0:
-            return str(self.current_view.to_dict(orient='records'))
-        else:
-            return str(self.current_view.head(n).to_dict(orient='records'))
+    def get_current_view(self, start,  n) -> pd.DataFrame:
+        return 'Current View: \n' + str(self.current_view.iloc[start: start + n, :].to_dict(orient='records')) + f'\n\n There Are {len(self.current_view)} total rows in the current view'
         
     def get_current_schema(self):
         data_dictionary = self.data_dictionaries[self.base_name]
@@ -341,7 +338,7 @@ class dataToolsManager:
         if aggregation not in ('min', 'max', 'sum', 'count', 'mean', 'median', 'std', 'nunique'):
             return 'There was an error, Message: ' + aggregation + ' is an invalid aggregation. it must be one of "min", "max", "sum", "count", "mean", "median", "std", "nunique"'
         self.current_view = self.current_view.agg(aggregation)
-        return f'Success, here is the current view after applying the {aggregation} function:\n {self.get_current_view(0)}'
+        return f'Success, here ate the top 5 rows of the current view after applying the {aggregation} function:\n {self.get_current_view(0, 5)} \n\n If you need more records use the get_current_view function'
     
     def aggregate_column(self, column: str, aggregation: str):
         if aggregation not in ('min', 'max', 'sum', 'count', 'mean', 'median', 'std', 'nunique'):
@@ -355,6 +352,6 @@ class dataToolsManager:
     
     def get_top_n(self, sortby: str, ascending: bool, n: int):
         self.current_view = self.current_view.sort_values(by=sortby, ascending=bool(ascending)).head(n)
-        return f'The top {n} values ranked by {sortby} with ascending={ascending} are: \n{self.get_current_view(0)}'
+        return f'The top {n} values ranked by {sortby} with ascending={ascending} are: \n{self.get_current_view(0, n)}'
     
     

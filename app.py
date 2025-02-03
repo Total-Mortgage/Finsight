@@ -93,18 +93,19 @@ def get_current_date() -> str:
     return resp
 
 @tool
-def get_current_view(n) -> list[dict]:
+def get_current_view(start, n) -> list[dict]:
     '''
     Returns first n records in the current view. If n == 0 this returns the entire current view instead. 
     Only call this function as needed, often times the responses from other tools will give you enough information about the current view without you needing to explicitly see it.
     Parameters:
-    - n (int): The number of rows to retrieve from the current view. If n==0 then all rows are retrieved
+    - start (int): The index of the dataframe at which to start
+    - n (int): The number of rows to retrieve after the starting point
     Example usage:
-    get_current_view(5) //get first 5 rows in the current view
-    get_current_view(0) //get all rows in the current view
+    get_current_view(0, 5) //get first 5 rows in the current view
+    get_current_view(5, 5) //get next 5 rows (indices 5-10) in the current view
     '''
     dataframe_manager = dataToolsManager.instances[session['session_id']]
-    resp = dataframe_manager.get_current_view(n)
+    resp = dataframe_manager.get_current_view(start, n)
     return resp
 
 @tool
@@ -289,13 +290,13 @@ leads: {context_manager.data_dictionaries['leads']}
 '''
 
 # collecting tools
-tools = [select_base, get_current_view, get_current_schema, select_columns, get_current_date, filter_dataframe, extract_datepart, create_custom_column_from_columns, create_custom_column_from_value, aggregate_column, get_top_n]
+tools = [select_base, get_current_view, get_current_schema, aggregate_group, select_columns, get_current_date, filter_dataframe, extract_datepart, create_custom_column_from_columns, create_custom_column_from_value, aggregate_column, get_top_n]
 
 
 prompt = hub.pull('hwchase17/openai-tools-agent')
 
 # loading chat agent
-llm = ChatOpenAI(model='gpt-3.5-turbo-0125', organization='org-3xZIlg8TIVWf5J0rRTNGlIvt', temperature=0)
+llm = ChatOpenAI(model='gpt-4o-mini', organization='org-3xZIlg8TIVWf5J0rRTNGlIvt', temperature=0)
 agent = create_openai_tools_agent(llm, tools, prompt)
 agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=True, return_intermediate_steps=True, )
 

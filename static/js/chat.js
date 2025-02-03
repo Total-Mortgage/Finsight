@@ -23,7 +23,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 // Append the stepsTakenContainer to the message container
                 messageElement.appendChild(stepsTakenContainer);
-                const responseElement = document.createElement('span');
+                const responseElement = document.createElement('pre');
                 responseElement.textContent = '[AI]:\n' + message.message;
                 // You can add additional styling to this element if needed
                 messageElement.appendChild(responseElement);
